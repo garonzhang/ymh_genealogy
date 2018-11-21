@@ -34,7 +34,7 @@ def get_chinese_number(number):
 
 
 # 获取父母名字信息
-# flag = 1 法律父母， flag = 2， 生父母
+# flag = 1 法律父母， flag = 2 生父母
 def get_parent_name(member_dict, member_obj, flag=1):
     parent_name = ""
 
@@ -84,7 +84,6 @@ def get_child_info(member_queue, member_obj, member_dict):
     step_info = ""
 
     for child_obj in child_list:
-
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
             member_queue.put(child_obj)
 
