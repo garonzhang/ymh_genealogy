@@ -54,10 +54,10 @@ def get_parent_name(member_dict, member_obj, flag=1):
         mother_name = father_obj.member_name
 
     if father_name is not None:
-        parent_name += "父" if flag ==1 else '养父'
+        parent_name += "父" if flag == 1 else '养父'
         parent_name += father_name + "，"
     if mother_name is not None and mother_name != "":
-        parent_name += "母" if flag ==1 else '养母'
+        parent_name += "母" if flag == 1 else '养母'
         parent_name += mother_name.replace(";", "、") + "，"
 
     return parent_name
@@ -74,16 +74,14 @@ def get_spouse_name(member_obj):
 
 
 # 获取子女信息
-def get_child_info( member_queue, member_obj, member_dict):
+def get_child_info(member_queue, member_obj, member_dict):
     child_info = ""
-    step_info = ""
-
     son_count = 0
     daughter_count = 0
 
     child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
     child_names = ""
-    step_info  = ""
+    step_info = ""
 
     for child_obj in child_list:
 
@@ -106,7 +104,7 @@ def get_child_info( member_queue, member_obj, member_dict):
             if step_father_obj is None:
                 print("step father not exist", step_father_id)
             else:
-                step_info = step_info + child_obj.member_name + "出继"+step_father_obj.member_name +"，"
+                step_info = step_info + child_obj.member_name + "出继"+step_father_obj.member_name + "，"
 
     if child_names != "":
         child_info += "有"
@@ -163,6 +161,10 @@ def get_subtype(member_obj):
 
 
 def gen_book(member_dict, first_member_id, file_name):
+    descent_no_tag = 'A'
+    member_name_tag = 'B'
+    member_description_tag = 'C'
+
     member_queue = Queue()
 
     member_obj = member_dict.get(first_member_id)
@@ -173,17 +175,18 @@ def gen_book(member_dict, first_member_id, file_name):
     file = open(file_name, "w", encoding='UTF-8')
     member_queue.put(member_obj)
     cur_descent_no = member_obj.descent_no
-    file.write("## 第 " + str(member_obj.descent_no) + ' 世\n')
+    file.write("## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n')
 
     while not member_queue.empty():
         record_content = ""
         member_obj = member_queue.get()
 
         if member_obj.descent_no != cur_descent_no:
-            record_content += "## 第 "+str(member_obj.descent_no) + " 世\n"
+            record_content += "## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n'
             cur_descent_no = member_obj.descent_no
 
-        record_content += "**<font size=4>" + member_obj.member_name +"\n" + "</font>** <font size=3>"
+        record_content += "**<font size=4>" + member_obj.member_name + member_name_tag + "\n" + "</font>** <font " \
+                                                                                                "size=3> "
 
         # 当且仅当性别为女性时，需要标注性别
         sex = "" if member_obj.sex == 1 else "女，"
@@ -199,11 +202,11 @@ def gen_book(member_dict, first_member_id, file_name):
 
         # 生父母信息
         if member_obj.step_father_id is not None:
-            bio_parent_name = get_parent_name(member_dict, member_obj,2)
+            bio_parent_name = get_parent_name(member_dict, member_obj, 2)
             record_content += bio_parent_name
 
         # 配偶信息
-        spouse_name  = get_spouse_name(member_obj)
+        spouse_name = get_spouse_name(member_obj)
         record_content += spouse_name
 
         # 子女信息
@@ -223,7 +226,7 @@ def gen_book(member_dict, first_member_id, file_name):
         # 描述
         description = get_description(member_obj)
         if description != "":
-         record_content += description + "。"
+            record_content += description + "。"
 
         # 其配偶描述
         spouse_description = get_spouse_description(member_obj)
@@ -232,9 +235,8 @@ def gen_book(member_dict, first_member_id, file_name):
         if record_content[-1] == "，":
             record_content = record_content[:-1] + "。"
         record_content += "</font>"
+        record_content += member_description_tag
 
         file.write(record_content + "\n")
 
     file.close()
-
-

@@ -28,5 +28,5 @@ if __name__ == "__main__":
     member_dict = load_members()
 
     #gen_tree()
-    #gen_book()
-    gen_circular_tree()
+    gen_book()
+    #gen_circular_tree()
