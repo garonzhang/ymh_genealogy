@@ -7,7 +7,7 @@ from member import Member
 def get_member_obj(member_dict, member_id, r):
     member_obj = member_dict.get(member_id, None)
     if member_obj is None:
-        member_obj = Member(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11], r[12])
+        member_obj = Member(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11], r[12], r[13], r[14])
         member_dict[member_obj.member_id] = member_obj
     #member_obj.print_out()
     return member_obj
@@ -18,7 +18,7 @@ def load_members():
     member_dict = {}
 
     columns = "member_id, father_id, step_father_id, order_seq, step_order_seq, \
-               member_name, sex, descent_no, spouse_name, career, description, spouse_description, subtype"
+               member_name, sex, descent_no, spouse_name, career, description, spouse_description, subtype, pre_member_id, next_member_id"
 
     db_manager = DbManager()
     cur = db_manager.conn.cursor()
