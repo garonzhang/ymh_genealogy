@@ -40,15 +40,9 @@ class Member:
 
     # 打印输出成员对象
     def print_out(self):
-        print(self.member_id,
-              self.father_id,
-              self.step_father_id,
-              self.member_name,
-              self.descent_no,
-              self.description),
-
-        for child in sorted(self.child_list, key=lambda child: child.order_seq):
-            print(child.member_name)
+        print(self.member_id, self.member_name,self.descent_no),
+        for child in sorted(self.child_list, key=lambda c: c.order_seq):
+            print(child.member_name),
         print("\n")
 
 

@@ -42,7 +42,7 @@ def get_parent_name(member_dict, member_obj, flag=1):
     father_obj = member_dict.get(father_id)
 
     if father_obj is None:
-        print("line_no=45, member_id:{member_id} not exist".format(member_id=father_id))
+        print("line_no=45, member_id:{member_id} 's father not exist".format(member_id=member_obj.member_id))
         return ""
 
     # 兼顾入赘的情况
@@ -168,7 +168,7 @@ def gen_book(member_dict, first_member_id, file_name):
 
     member_obj = member_dict.get(first_member_id)
     if member_obj is None:
-        print("line_no=41, member_id:{member_id} not exist".format(member_id=first_member_id))
+        print("line_no=171, member_id:{member_id} not exist".format(member_id=first_member_id))
         return
 
     file = open(file_name, "w", encoding='UTF-8')
@@ -179,7 +179,7 @@ def gen_book(member_dict, first_member_id, file_name):
     while not member_queue.empty():
         record_content = ""
         member_obj = member_queue.get()
-
+        member_obj.print_out()
         if member_obj.descent_no != cur_descent_no:
             record_content += "## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n'
             cur_descent_no = member_obj.descent_no
