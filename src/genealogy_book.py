@@ -85,12 +85,14 @@ def get_child_info(member_queue, member_obj, member_dict):
 
     for child_obj in child_list:
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
-            # 插入前驱节点
+            # 插入前驱成员节点
             if child_obj.pre_member_id is not None and child_obj.pre_member_id != 0:
                 member_queue.put(member_dict.get(child_obj.pre_member_id))
+
+            # 插入当前成员节点
             member_queue.put(child_obj)
 
-            # 插入后继节点
+            # 插入后继成员节点
             if child_obj.next_member_id is not None and child_obj.next_member_id != 0:
                 member_queue.put(member_dict.get(child_obj.next_member_id))
 
