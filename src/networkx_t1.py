@@ -1,44 +1,44 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
+def draw_org():
+    G = nx.DiGraph()
+    G.add_node("ROOT")
+    for i in range(5):
+        G.add_node("Child_%i" % i)
+        G.add_node("child_%i" % i)
+        G.add_node("child_%i" % i)
 
-def hierarchy_pos(G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5,
-                  pos = None, parent = None):
-    '''If there is a cycle that is reachable from root, then this will see infinite recursion.
-       G: the graph
-       root: the root node of current branch
-       width: horizontal space allocated for this branch - avoids overlap with other branches
-       vert_gap: gap between levels of hierarchy
-       vert_loc: vertical location of root
-       xcenter: horizontal location of root
-       pos: a dict saying where all nodes go if they have been assigned
-       parent: parent of this branch.'''
-    if pos == None:
-        pos = {root:(xcenter,vert_loc)}
-    else:
-        pos[root] = (xcenter, vert_loc)
-    neighbors = list(G.neighbors(root))
-    if parent != None:   #this should be removed for directed graphs.
-        neighbors.remove(parent)  #if directed, then parent not in neighbors.
-    if len(neighbors)!=0:
-        dx = width/len(neighbors)
-        nextx = xcenter - width/2 - dx/2
-        for neighbor in neighbors:
-            nextx += dx
-            pos = hierarchy_pos(G,neighbor, width = dx, vert_gap = vert_gap,
-                                vert_loc = vert_loc-vert_gap, xcenter=nextx, pos=pos,
-                                parent = root)
-    return pos
+        G.add_edge("ROOT", "Child_%i" % i)
+        G.add_edge("Child_%i" % i, "child_%i" % i)
+        G.add_edge("child_%i" % i, "child_%i" % i)
+
+    plt.title('The OrgChart Demo')
+    pos = nx.nx_agraph.graphviz_layout(G, prog='dot')
+    nx.draw(G, pos, with_labels=True, arrows=False, node_shape='s', node_size=2000,  alpha=0.5, font_size=10)
+    plt.savefig('../output/nx_org.svg')
 
 
-def hierarchy():
-    G = nx.Graph()
-    G.add_edges_from([(1, 2), (1, 3), (1, 4), (2, 5), (2, 6), (2, 7), (3, 8), (3, 9), (4, 10),
-                      (5, 11), (5, 12), (6, 13), (7,14), (7,15), (7,16), (8,17), (8,18), (8,19)])
-    pos = hierarchy_pos(G, 1)
-    nx.draw(G, pos=pos, with_labels=True)
-    plt.savefig('../output/hierarchy.svg')
+def draw_circular():
+    try:
+        import pygraphviz
+        from networkx.drawing.nx_agraph import graphviz_layout
+    except ImportError:
+        try:
+            import pydot
+            from networkx.drawing.nx_pydot import graphviz_layout
+        except ImportError:
+            raise ImportError("This example needs Graphviz and either "
+                              "PyGraphviz or pydot")
+
+    G = nx.balanced_tree(3, 5)
+    pos = graphviz_layout(G, prog='twopi', args='')
+    plt.figure(figsize=(8, 8))
+    nx.draw(G, pos, node_size=20, alpha=0.5, node_color="blue", with_labels=False)
+    plt.axis('equal')
+    plt.savefig('../output/nx_circular.svg')
 
 
 if __name__ == "__main__":
-    hierarchy()
+    draw_org()
+    #draw_circular()

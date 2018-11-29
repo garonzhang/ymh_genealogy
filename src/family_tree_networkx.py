@@ -4,35 +4,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def hierarchy_pos(G, root, width=2000., vert_gap=500, vert_loc=0, xcenter = 0.5,
-                  pos = None, parent = None):
-    '''If there is a cycle that is reachable from root, then this will see infinite recursion.
-       G: the graph
-       root: the root node of current branch
-       width: horizontal space allocated for this branch - avoids overlap with other branches
-       vert_gap: gap between levels of hierarchy
-       vert_loc: vertical location of root
-       xcenter: horizontal location of root
-       pos: a dict saying where all nodes go if they have been assigned
-       parent: parent of this branch.'''
-    if pos == None:
-        pos = {root: (xcenter, vert_loc)}
-    else:
-        pos[root] = (xcenter, vert_loc)
-    neighbors = list(G.neighbors(root))
-    if parent != None:   #this should be removed for directed graphs.
-        neighbors.remove(parent)  #if directed, then parent not in neighbors.
-    if len(neighbors)!=0:
-        dx = width/len(neighbors)
-        nextx = xcenter - width/2 - dx/2
-        for neighbor in neighbors:
-            nextx += dx
-            pos = hierarchy_pos(G, neighbor, width=dx*100, vert_gap=vert_gap*200,
-                                vert_loc=vert_loc-vert_gap, xcenter=nextx, pos=pos,
-                                parent=root)
-    return pos
-
-
 def draw_node(member_dict, cur_node, data_part):
     print(cur_node.member_name)
     cur_member_id = cur_node.member_id
@@ -66,15 +37,11 @@ def get_data_part(member_dict, first_member_id):
 
     return data_part
 
-    # [(1, 2), (1, 3), (1, 4), (2, 5), (2, 6), (2, 7), (3, 8), (3, 9), (4, 10),
-    #                       (5, 11), (5, 12), (6, 13), (7, 14), (7, 15), (7, 16), (8, 17), (8, 18), (8, 19)]
-
 
 def draw_tree(member_dict, first_member_id, file_name):
     data_part = get_data_part(member_dict, first_member_id)
-    G = nx.Graph()
+    G = nx.DiGraph()
     G.add_edges_from(data_part)
-    pos = hierarchy_pos(G, first_member_id)
-    nx.draw(G, pos=pos, with_labels=True)
-    plt.savefig(file_name)
-
+    pos = nx.nx_agraph.graphviz_layout(G, prog='dot')
+    nx.draw(G, pos, with_labels=False, arrows=False, node_shape='s', node_size=2, alpha=0.5, font_size=1)
+    plt.savefig('../output/nx_familytree.svg')
