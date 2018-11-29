@@ -246,5 +246,4 @@ def gen_book(member_dict, first_member_id, file_name):
         record_content += member_description_tag
 
         file.write(record_content + "\n")
-
     file.close()
