@@ -35,6 +35,7 @@ def gen_networkx_tree():
         file_name = "../data/networkx_tmp.svg"
     family_tree_networkx.draw_tree(member_dict, first_member_id, file_name)
 
+
 def gen_graphyviz_tree():
     first_member_id = 104
     if first_member_id == 1:
