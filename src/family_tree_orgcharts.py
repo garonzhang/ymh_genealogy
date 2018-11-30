@@ -53,8 +53,8 @@ def draw_node(member_dict, cur_node):
     for son_member_obj in member_obj.legal_child_list[::-1]:
         son_spouse_name = son_member_obj.spouse_name if son_member_obj.spouse_name is not None else ""
         classname = "middle-level" if son_member_obj.sex is 1 else "product-dept"
-        child_node = MemberNode(son_member_obj.member_id, son_member_obj.member_name, son_member_obj.sex,son_spouse_name,
-                                son_member_obj.descent_no, classname)
+        child_node = MemberNode(son_member_obj.member_id, son_member_obj.member_name, son_member_obj.sex,
+                                son_member_obj.descent_no, son_spouse_name, classname)
         cur_node.add_child(child_node)
         draw_node(member_dict, child_node)
 
@@ -67,7 +67,7 @@ def get_data_part(member_dict, first_member_id):
     spouse_name = member_obj.spouse_name
     descent_no = member_obj.descent_no
 
-    first_node = MemberNode(first_member_id, member_name, sex, spouse_name, descent_no, "middle-level")
+    first_node = MemberNode(first_member_id, member_name, sex, descent_no, spouse_name,"middle-level")
     draw_node(member_dict, first_node)
     result = json.dumps(first_node, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)+";"
     print(result)
@@ -79,8 +79,8 @@ def get_post_part():
                 var nodeTemplate = function(data) {
                   return `
                     <div class="title">${data.member_name}</div>
-                    <div class="content">${data.spouse_name}</div>
                     <div class="content">${data.descent_no}</div>
+                    <div class="content">${data.spouse_name}</div>
                   `;
                 };
             

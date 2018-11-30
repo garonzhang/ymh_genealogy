@@ -1,66 +1,68 @@
 import pygraphviz as pgv
+from member import MemberNode
 
 
-def get_point_count(sons_list):
-    sons_count = len(sons_list)
-    point_count = sons_count if sons_count % 2 != 0 else sons_count + 1
-    return point_count
+def get_node_color(memberNode_obj):
+    node_color = 'pink' if memberNode_obj.sex == 0 else 'black'
+    return node_color
 
 
-def draw_tree(member_dict):
-    G = pgv.AGraph(strict=False, overlap='false')
+def get_struct_info(memberNode_obj):
+    print(memberNode_obj.member_name, memberNode_obj.member_id, memberNode_obj.descent_no, memberNode_obj.spouse_name)
+    # label内容若由大括号包含，则按行展示，否则，则按列展示
+    # spouse_name 若为汉字，则显示为空，原因在于：port 之后必须有空格，否则无法显示汉字。
+    struct_info = "{{<member_name> " + memberNode_obj.member_name + "}" + "|{<descent_no> " + str(memberNode_obj.descent_no) + "}" + "|{<spouse_name> " + memberNode_obj.spouse_name + "}}"
+    #struct_info = "<member_name> " + memberNode_obj.member_name + "|<descent_no> " + str(memberNode_obj.descent_no) + "|<spouse_name> " + memberNode_obj.spouse_name + ""
+
+    return struct_info
+
+
+# 处理当前成员节点
+def draw_node(G, member_dict, cur_node):
+    print(cur_node.member_name)
+    cur_member_id = cur_node.member_id
+    member_obj = member_dict.get(cur_node.member_id)
+
+    cur_struct_info = get_struct_info(cur_node)
+    G.add_node(cur_member_id, label=cur_struct_info, color=get_node_color(cur_node))
+
+    if member_obj is None:
+        print("member_id:{member_id} not exist".format(member_id=cur_member_id))
+
+    member_obj.legal_child_list.sort(key=lambda child_obj: child_obj.order_seq)
+    for son_member_obj in member_obj.legal_child_list[::-1]:
+        son_spouse_name = son_member_obj.spouse_name if son_member_obj.spouse_name is not None else ""
+        classname = "middle-level" if son_member_obj.sex is 1 else "product-dept"
+        child_node = MemberNode(son_member_obj.member_id, son_member_obj.member_name, son_member_obj.sex,
+                                son_member_obj.descent_no, son_spouse_name, classname)
+
+        child_struct_info = get_struct_info(child_node)
+        G.add_node(child_node.member_id, label=child_struct_info, color=get_node_color(child_node))
+
+        G.add_edge(cur_member_id, child_node.member_id, headport='', tailport='')
+        draw_node(G, member_dict, child_node)
+
+
+def draw_tree(member_dict, first_member_id, filename, title_name):
+    G = pgv.AGraph(strict=False, overlap=False)
+    G.graph_attr['label'] = title_name
+    G.graph_attr['labelloc'] = 't' # 图名字位置在上面 t, 在下面 b
+    G.graph_attr['labeljust'] = 'r' # 图名字位置在左侧 l, 在右侧 r
     G.graph_attr['rankdir'] = 'TB'
     G.graph_attr['splines'] = 'ortho'
     G.node_attr['shape'] = 'record'
-
     G.layout(prog='dot')
 
-    # 创建各节点及各节点的垂直向下 point，用作与其子节点的连接点
-    for member_id, member_obj in member_dict.items():
-        #print(member_id, member_obj.member_name)
 
-        spouse_name = member_obj.spouse_name
-        if spouse_name is None:
-            spouse_name = ""
+    # 获取到第一个成员节点
+    member_obj = member_dict.get(first_member_id)
+    member_name = member_obj.member_name
+    sex = member_obj.sex
+    spouse_name = member_obj.spouse_name
+    descent_no = member_obj.descent_no
 
-        # label内容若由大括号包含，则按行展示，否则，则按列展示
-        # spouse_name 若为汉字，则显示为空，原因在于：port 之后必须有空格，否则无法显示汉字。
-        struct_info = "{{<member_name> " + member_obj.member_name + "|<descent_no> " + str(member_obj.descent_no) +"}"+\
-                      "|<spouse_name> " + spouse_name + "}"
-        G.add_node(member_id,label=struct_info)
+    first_member_node = MemberNode(first_member_id, member_name, sex, descent_no, spouse_name, "middle-level")
+    draw_node(G, member_dict, first_member_node)
 
-        # 生成当前 member 节点下方的 point 集合
-        point_list = []
-        point_count = get_point_count(member_obj.sons_list)
-        for order in range(point_count):
-            point_id = "p"+str(order) + str(member_id)
-            G.add_node(point_id, shape='point')
-            #G.add_node(point_id, shape='point', style='invisible')
-            point_list.append(point_id)
-
-        # 确保生成的 N 个 point 处于同一水平位置
-        G.add_subgraph(point_list, rank='same')
-
-        # 连接当前 member 节点与生成的 N 个 point 中处于中间位置的 point
-        print("member_id = ", member_id, member_obj.member_name)
-        G.add_edge(member_id, "p"+str(int(point_count/2)) + str(member_id), arrowhead='none')
-
-        # 将生成的 N 个 point 点顺次连接
-        for i in range(point_count - 1):
-            G.add_edge(point_list[i],point_list[i + 1], arrowhead='none',color='black',shape='ortho')
-
-    # 将各节点下方的各 point 与其儿子 member 节点连接起来
-    for member_id, member_obj in member_dict.items():
-        sons_list = member_obj.sons_list
-        for order in range(len(sons_list)):
-            point_index = order
-            if len(sons_list) %2 == 0 and point_index >= int(len(sons_list)/2):
-                point_index = point_index + 1
-            point_id = "p" + str(point_index) + str(member_id)
-            G.add_edge(point_id, sons_list[order], arrowhead='none',color='black')
-        for index in range(len(sons_list)-1):
-            G.add_edge(sons_list[index], sons_list[index + 1], arrowhead='none',color='black')
-        G.add_subgraph(sons_list, rank='same')
-
-    G.draw("../data/familytree.svg", format='svg', prog='dot')
+    G.draw(filename, format='svg', prog='dot')
 

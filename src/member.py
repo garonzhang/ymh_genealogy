@@ -64,7 +64,6 @@ class MemberNode:
         self.children.append(child_obj)
 
 
-
 if __name__ == "__main__":
     member_obj = Member(1, 2, None, 1, None, 'a', 1, 10, '', '', '', '', '温庄')
     member_obj.print_out()
