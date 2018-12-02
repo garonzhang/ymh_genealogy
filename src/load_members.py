@@ -26,6 +26,7 @@ def load_members():
     cur_s = db_manager.conn.cursor()
 
     cur.execute("SELECT " + columns + " FROM tb_members WHERE descent_no < 30 and descent_no > 0")
+    #cur.execute("SELECT " + columns + " FROM tb_members WHERE source_type like '%总谱%' and descent_no < 30 and descent_no > 0")
     for r in cur:
         member_id = r[0]
         member_obj = get_member_obj(member_dict, member_id, r)

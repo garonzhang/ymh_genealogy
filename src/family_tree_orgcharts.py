@@ -70,7 +70,7 @@ def get_data_part(member_dict, first_member_id):
     first_node = MemberNode(first_member_id, member_name, sex, descent_no, spouse_name,"middle-level")
     draw_node(member_dict, first_node)
     result = json.dumps(first_node, default=lambda o: o.__dict__, sort_keys=True, indent=4, ensure_ascii=False)+";"
-    print(result)
+    #print(result)
     return result
 
 
