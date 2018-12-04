@@ -13,8 +13,6 @@ def get_struct_info(memberNode_obj):
     # label内容若由大括号包含，则按行展示，否则，则按列展示
     # spouse_name 若为汉字，则显示为空，原因在于：port 之后必须有空格，否则无法显示汉字。
     struct_info = "{{<member_name> " + memberNode_obj.member_name + "}" + "|{<descent_no> " + str(memberNode_obj.descent_no) + "}" + "|{<spouse_name> " + spouse_name + "}}"
-    #struct_info = "<member_name> " + memberNode_obj.member_name + "|<descent_no> " + str(memberNode_obj.descent_no) + "|<spouse_name> " + memberNode_obj.spouse_name + ""
-
     return struct_info
 
 

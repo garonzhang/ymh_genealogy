@@ -96,14 +96,17 @@ def get_child_info(member_queue, member_obj, member_dict):
             if child_obj.next_member_id is not None and child_obj.next_member_id != 0:
                 member_queue.put(member_dict.get(child_obj.next_member_id))
 
-        child_names = child_names + child_obj.member_name
+        # 当子女名字待考时，直接以下划线代替
+        cur_child_name = child_obj.member_name if child_obj.member_name != '待考' else '____'
+        child_names = child_names + cur_child_name
 
+        # 针对女性子女，添加性别
         if child_obj.sex == 0:
             daughter_count += 1
         else:
             son_count += 1
-
         child_names += "(女) " if child_obj.sex == 0 else " "
+
 
         # 出嗣情况
         if child_obj.step_father_id is not None and child_obj.step_father_id != member_obj.member_id:
@@ -188,6 +191,11 @@ def gen_book(member_dict, first_member_id, file_name):
     while not member_queue.empty():
         record_content = ""
         member_obj = member_queue.get()
+
+        # 如果名字为待考，则不出现在世系中
+        if member_obj.member_name == '待考':
+            continue
+
         member_obj.print_out()
         if member_obj.descent_no != cur_descent_no:
             record_content += "## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n'

@@ -50,7 +50,7 @@ if __name__ == "__main__":
     member_dict = load_members()
 
     #gen_networkx_tree()
-    gen_graphyviz_tree()
+    #gen_graphyviz_tree()
     #gen_org_tree()
-    #gen_book()
+    gen_book()
     #gen_circular_tree()
