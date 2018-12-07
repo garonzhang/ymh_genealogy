@@ -19,7 +19,7 @@ def gen_book():
 
 
 def gen_org_tree():
-    first_member_id = 4086
+    first_member_id = 1
     if first_member_id == 1:
         file_name = "../data/orgchart_tree.html"
     else:
@@ -28,7 +28,7 @@ def gen_org_tree():
 
 
 def gen_networkx_tree():
-    first_member_id = 4086
+    first_member_id = 40
     if first_member_id == 1:
         file_name = "../data/networkx_tree.svg"
     else:
@@ -37,12 +37,12 @@ def gen_networkx_tree():
 
 
 def gen_graphyviz_tree():
-    first_member_id = 104
+    first_member_id = 5476
     if first_member_id == 1:
-        file_name = "../data/graphyviz_tree.svg"
+        file_name = "../output/graphyviz_tree.svg"
     else:
         file_name = "../output/graphviz_tmp.svg"
-    title_name = '崔庄家谱树'
+    title_name = '万祥分支家谱树'
     family_tree_pygraphviz.draw_tree(member_dict, first_member_id, file_name, title_name)
 
 
