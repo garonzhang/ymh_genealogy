@@ -58,6 +58,9 @@ def get_parent_name(member_dict, member_obj, flag=1):
         parent_name += father_name + "，"
     if mother_name is not None and mother_name != "":
         parent_name += "母" if flag == 1 else '养母'
+        mother_name = mother_name.strip()
+        if mother_name == '氏':
+            mother_name = '__氏'
         parent_name += mother_name.replace(";", "、") + "，"
 
     return parent_name
@@ -68,8 +71,11 @@ def get_spouse_name(member_obj):
     spouse_name = ""
     spouse_label = "妻" if member_obj.sex == 1 else '夫'
     if member_obj.spouse_name is not None:
-        if member_obj.spouse_name.strip() != "":
-            spouse_name = spouse_label + member_obj.spouse_name.replace(";", "、") + "，"
+        m_spouse_name = member_obj.spouse_name.strip()
+        if m_spouse_name != "":
+            if m_spouse_name == '氏':
+                m_spouse_name = '__氏'
+            spouse_name = spouse_label + m_spouse_name.replace(";", "、") + "，"
     return spouse_name
 
 
@@ -86,15 +92,21 @@ def get_child_info(member_queue, member_obj, member_dict):
     for child_obj in child_list:
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
             # 插入前驱成员节点
-            if child_obj.pre_member_id is not None and child_obj.pre_member_id != 0:
-                member_queue.put(member_dict.get(child_obj.pre_member_id))
+            if child_obj.pre_member_id is not None and child_obj.pre_member_id != '':
+                member_id_list = child_obj.pre_member_id.split(';')
+                for member_id in member_id_list:
+                    print("pre_member_id: ",child_obj.pre_member_id)
+                    member_queue.put(member_dict.get(int(member_id)))
 
             # 插入当前成员节点
             member_queue.put(child_obj)
 
             # 插入后继成员节点
-            if child_obj.next_member_id is not None and child_obj.next_member_id != 0:
-                member_queue.put(member_dict.get(child_obj.next_member_id))
+            if child_obj.next_member_id is not None and child_obj.next_member_id != '': # 有可能存在多个后继
+                member_id_list = child_obj.next_member_id.split(';')
+                for member_id in member_id_list:
+                    print("next_member_id: ",member_id)
+                    member_queue.put(member_dict.get(int(member_id)))
 
         # 当子女名字待考时，直接以下划线代替
         cur_child_name = child_obj.member_name if child_obj.member_name != '待考' else '____'
@@ -196,7 +208,7 @@ def gen_book(member_dict, first_member_id, file_name):
         if member_obj.member_name == '待考':
             continue
 
-        member_obj.print_out()
+        #member_obj.print_out()
         if member_obj.descent_no != cur_descent_no:
             record_content += "## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n'
             cur_descent_no = member_obj.descent_no
@@ -212,27 +224,35 @@ def gen_book(member_dict, first_member_id, file_name):
         subtype = get_subtype(member_obj)
         if subtype != "":
             record_content += subtype + "，"
+
         # 父母信息
-        parent_name = get_parent_name(member_dict, member_obj)
+        has_parents = False # 是否有上世
+
+        parent_name = get_parent_name(member_dict, member_obj)  # 父母信息
+        if parent_name != '':
+            has_parents = True
         record_content += parent_name
 
-        # 生父母信息
-        if member_obj.step_father_id is not None:
+        if member_obj.step_father_id is not None: # 生父母信息
             bio_parent_name = get_parent_name(member_dict, member_obj, 2)
+            if parent_name != '':
+                has_parents = True
             record_content += bio_parent_name
+        if has_parents == False:
+            record_content += '上世未详，'
 
         # 配偶信息
         spouse_name = get_spouse_name(member_obj)
         record_content += spouse_name
 
         # 子女信息
-        if member_obj.child_list is None:
-            continue
-        child_info = get_child_info(member_queue, member_obj, member_dict)
-        record_content += child_info
-        if record_content[-1] == "，":
-            record_content = record_content[:-1]
-        record_content += "。"
+        if member_obj.child_list:
+            child_info = get_child_info(member_queue, member_obj, member_dict)
+            record_content += child_info
+            if record_content[-1] == "，":
+                record_content = record_content[:-1]
+            if record_content != "":
+                record_content += "。"
 
         # 职业
         career = get_career(member_obj)

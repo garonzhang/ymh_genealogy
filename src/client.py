@@ -37,7 +37,7 @@ def gen_networkx_tree():
 
 
 def gen_graphyviz_tree():
-    first_member_id = 5476
+    first_member_id = 2118
     if first_member_id == 1:
         file_name = "../output/graphyviz_tree.svg"
     else:
