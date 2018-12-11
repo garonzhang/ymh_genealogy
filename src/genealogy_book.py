@@ -53,6 +53,9 @@ def get_parent_name(member_dict, member_obj, flag=1):
         father_name = father_obj.spouse_name
         mother_name = father_obj.member_name
 
+    father_name = '____' if father_name == '待考' else father_name
+    mother_name = '____' if mother_name == '待考' else mother_name
+
     if father_name is not None:
         parent_name += "父" if flag == 1 else '养父'
         parent_name += father_name + "，"
@@ -61,7 +64,7 @@ def get_parent_name(member_dict, member_obj, flag=1):
         mother_name = mother_name.strip()
         if mother_name == '氏':
             mother_name = '__氏'
-        parent_name += mother_name.replace(";", "、") + "，"
+        parent_name += mother_name.replace(";", "、").replace('待考', '____') + "，"
 
     return parent_name
 
@@ -75,7 +78,7 @@ def get_spouse_name(member_obj):
         if m_spouse_name != "":
             if m_spouse_name == '氏':
                 m_spouse_name = '__氏'
-            spouse_name = spouse_label + m_spouse_name.replace(";", "、") + "，"
+            spouse_name = spouse_label + m_spouse_name.replace(";", "、").replace('待考', '____') + "，"
     return spouse_name
 
 
@@ -118,7 +121,6 @@ def get_child_info(member_queue, member_obj, member_dict):
         else:
             son_count += 1
         child_names += "(女) " if child_obj.sex == 0 else " "
-
 
         # 出嗣情况
         if child_obj.step_father_id is not None and child_obj.step_father_id != member_obj.member_id:
@@ -203,17 +205,23 @@ def gen_book(member_dict, first_member_id, file_name):
     while not member_queue.empty():
         record_content = ""
         member_obj = member_queue.get()
+        cur_member_name = member_obj.member_name
 
-        # 如果名字为待考，则不出现在世系中
-        if member_obj.member_name == '待考':
-            continue
+        # 名字为待考的处理规则：
+        # (1) 若无子女，则不出现在世系表中，其其他信息则出现在其上世信息中
+        # (2) 若有子女，出现在世系表中，但名字以下划线代替
+        if cur_member_name == '待考':
+            if member_obj.child_list:
+                cur_member_name = '____'
+            else:
+                continue
 
         #member_obj.print_out()
         if member_obj.descent_no != cur_descent_no:
             record_content += "## 第 " + str(member_obj.descent_no) + " 世" + descent_no_tag + '\n'
             cur_descent_no = member_obj.descent_no
 
-        record_content += "**<font size=4>" + member_obj.member_name + member_name_tag + "\n" + "</font>** <font " \
+        record_content += "**<font size=4>" + cur_member_name + member_name_tag + "\n" + "</font>** <font " \
                                                                                                 "size=3> "
 
         # 当且仅当性别为女性时，需要标注性别
