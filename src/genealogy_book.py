@@ -53,6 +53,10 @@ def get_parent_name(member_dict, member_obj, flag=1):
         father_name = father_obj.spouse_name
         mother_name = father_obj.member_name
 
+    # 当明确指明其母的时候，则取其母名
+    if member_obj.mother_name is not None and member_obj.mother_name != '':
+        mother_name = member_obj.mother_name
+
     father_name = '____' if father_name == '待考' else father_name
     mother_name = '____' if mother_name == '待考' else mother_name
 
@@ -82,17 +86,53 @@ def get_spouse_name(member_obj):
     return spouse_name
 
 
+# 获取中文排行
+def get_chinese_order(order,sex):
+    chinese_sex = '子' if sex == 1 else '女'
+    chinese_order = ''
+    if order == 1:
+        chinese_order = '长'
+    elif order == 2:
+        chinese_order = '次'
+    else:
+        chinese_order = get_chinese_number(order)
+    return chinese_order + chinese_sex
+
+
+# 获取女儿备注信息
+def get_children_description(member_obj):
+    daughter_description = ''
+    daughter_order = 1
+    has_unknown_daughter = False
+
+    for child_obj in member_obj.child_list:
+        if child_obj.sex == 0:
+            child_description = '' if child_obj.description is None else child_obj.description
+            if child_description != '':
+                daughter_description += get_chinese_order(daughter_order, child_obj.sex) + child_description + "，"
+            daughter_order += 1
+            if child_obj.member_name == '待考' and child_description != '':
+                has_unknown_daughter = True
+    if not has_unknown_daughter:
+        daughter_description = ''
+
+    if daughter_order == 2: #  若仅一女，则无需用"长"代表
+        daughter_description = daughter_description[1:]
+
+    return daughter_description
+
+
 # 获取子女信息
 def get_child_info(member_queue, member_obj, member_dict):
     child_info = ""
     son_count = 0
     daughter_count = 0
 
-    child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
+    #child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
     child_names = ""
     step_info = ""
 
-    for child_obj in child_list:
+    for child_obj in member_obj.child_list:
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
             # 插入前驱成员节点
             if child_obj.pre_member_id is not None and child_obj.pre_member_id != '':
@@ -141,6 +181,8 @@ def get_child_info(member_queue, member_obj, member_dict):
 
     if step_info != "":
         child_info += "。其中，" + step_info
+
+
     return child_info
 
 
@@ -184,6 +226,16 @@ def get_subtype(member_obj):
         return subtype+"分支"
     return ""
 
+# 判断是否存在名字非待考的子女
+def has_known_child(member_obj):
+    if not member_obj.child_list:
+        return False
+
+    for child_obj in member_obj.child_list:
+        if child_obj.member_name != '待考':
+            return True
+    return False
+
 
 def gen_book(member_dict, first_member_id, file_name):
     descent_no_tag = 'A'
@@ -206,12 +258,19 @@ def gen_book(member_dict, first_member_id, file_name):
         record_content = ""
         member_obj = member_queue.get()
         cur_member_name = member_obj.member_name
-
+        child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
+        member_obj.child_list = child_list
         # 名字为待考的处理规则：
-        # (1) 若无子女，则不出现在世系表中，其其他信息则出现在其上世信息中
-        # (2) 若有子女，出现在世系表中，但名字以下划线代替
+        # (1) 针对女性成员
+        #     不单列词条。另外，若其有备注信息，则其备注信息出现在父亲中；与此同时，其姐妹无论名字是否待考，相应的备注信息也一并出现在父亲信息中
+        # (2) 针对男性成员
+        #     - 若有子女，且子女中有非待考的成员，则出现在世系表中，但名字以下划线代替
+        #     - 其他情况(即无子女或有子女但子女名字全部为待考时)，则不出现在世系表中, 其备注信息出现在父亲信息中（若其父亲都在词条中出现，如何处理？？）
         if cur_member_name == '待考':
-            if member_obj.child_list:
+            if member_obj.sex == 0: # 性别为女，则不出现在世系表中
+                continue
+
+            if has_known_child(member_obj):
                 cur_member_name = '____'
             else:
                 continue
@@ -270,11 +329,16 @@ def gen_book(member_dict, first_member_id, file_name):
         # 描述
         description = get_description(member_obj)
         if description != "":
-            record_content += description + "。"
+            record_content += "其" +description + "。"
 
         # 其配偶描述
         spouse_description = get_spouse_description(member_obj)
         record_content += spouse_description
+
+        # 子女备注信息
+        children_description = get_children_description(member_obj)[:-1]
+        if children_description != '':
+            record_content += children_description[:-1] + '。'
 
         if record_content[-1] == "，":
             record_content = record_content[:-1] + "。"

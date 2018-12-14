@@ -7,7 +7,7 @@
 
 class Member:
     def __init__(self, member_id, father_id, step_father_id, order_seq, step_order_seq, member_name, sex,
-                 descent_no, spouse_name, career, description, spouse_description, subtype, pre_member_id, next_member_id):
+                 descent_no, spouse_name, career, description, spouse_description, subtype, pre_member_id, next_member_id, mother_name):
         self.member_id = member_id
         self.father_id = father_id
         self.step_father_id = step_father_id
@@ -29,6 +29,9 @@ class Member:
         # 存储当前成员的前驱和后继成员ID，前驱后继仅针对于上世未详的成员
         self.pre_member_id  = pre_member_id
         self.next_member_id = next_member_id
+
+        # 存储母亲信息
+        self.mother_name = mother_name
 
         # 存储其子女对象（亲生+过继+义子）
         self.child_list = []
