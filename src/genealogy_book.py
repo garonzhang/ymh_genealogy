@@ -128,11 +128,12 @@ def get_child_info(member_queue, member_obj, member_dict):
     son_count = 0
     daughter_count = 0
 
-    #child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
     child_names = ""
     step_info = ""
 
     for child_obj in member_obj.child_list:
+        if child_obj.member_id == 8664:
+            print("$$$$$$$$$$$$$$$$$$$$$$$")
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
             # 插入前驱成员节点
             if child_obj.pre_member_id is not None and child_obj.pre_member_id != '':
@@ -226,6 +227,7 @@ def get_subtype(member_obj):
         return subtype+"分支"
     return ""
 
+
 # 判断是否存在名字非待考的子女
 def has_known_child(member_obj):
     if not member_obj.child_list:
@@ -243,8 +245,8 @@ def gen_book(member_dict, first_member_id, file_name):
     member_description_tag = 'C'
 
     member_queue = Queue()
-
     member_obj = member_dict.get(first_member_id)
+
     if member_obj is None:
         print("line_no=171, member_id:{member_id} not exist".format(member_id=first_member_id))
         return
@@ -260,12 +262,13 @@ def gen_book(member_dict, first_member_id, file_name):
         cur_member_name = member_obj.member_name
         child_list = sorted(member_obj.child_list, key=lambda child: child.order_seq)
         member_obj.child_list = child_list
+
         # 名字为待考的处理规则：
         # (1) 针对女性成员
         #     不单列词条。另外，若其有备注信息，则其备注信息出现在父亲中；与此同时，其姐妹无论名字是否待考，相应的备注信息也一并出现在父亲信息中
         # (2) 针对男性成员
         #     - 若有子女，且子女中有非待考的成员，则出现在世系表中，但名字以下划线代替
-        #     - 其他情况(即无子女或有子女但子女名字全部为待考时)，则不出现在世系表中, 其备注信息出现在父亲信息中（若其父亲都在词条中出现，如何处理？？）
+        #     - 其他情况(即无子女或有子女但子女名字全部为待考时)，则不出现在世系表中, 其备注信息出现在父亲信息中（若其父亲未在词条中出现，如何处理？？）
         if cur_member_name == '待考':
             if member_obj.sex == 0: # 性别为女，则不出现在世系表中
                 continue

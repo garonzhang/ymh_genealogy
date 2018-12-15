@@ -35,6 +35,7 @@ def load_members():
         cur_c.execute("SELECT " + columns + " FROM tb_members WHERE father_id = " + str(member_id))
         for c in cur_c:
             child_member_id = c[0]
+
             child_member_obj = get_member_obj(member_dict, child_member_id, c)
 
             # 将子女对象添加到生父的子女对象列表中
