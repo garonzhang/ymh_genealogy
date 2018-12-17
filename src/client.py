@@ -37,12 +37,12 @@ def gen_networkx_tree():
 
 
 def gen_graphyviz_tree():
-    first_member_id = 8365
+    first_member_id = 2719
     if first_member_id == 1:
         file_name = "../output/graphyviz_tree.svg"
     else:
         file_name = "../output/graphviz_tmp.svg"
-    title_name = '茌平分支家谱树'
+    title_name = ''
     family_tree_pygraphviz.draw_tree(member_dict, first_member_id, file_name, title_name)
 
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     member_dict = load_members()
 
     #gen_networkx_tree()
-    gen_graphyviz_tree()
+    #gen_graphyviz_tree()
     #gen_org_tree()
-    #gen_book()
+    gen_book()
     #gen_circular_tree()

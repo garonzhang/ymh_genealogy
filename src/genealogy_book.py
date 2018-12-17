@@ -129,11 +129,10 @@ def get_child_info(member_queue, member_obj, member_dict):
     daughter_count = 0
 
     child_names = ""
-    step_info = ""
+    step_info = "" # 出嗣信息
+    in_step_info = "" # 入嗣信息
 
     for child_obj in member_obj.child_list:
-        if child_obj.member_id == 8664:
-            print("$$$$$$$$$$$$$$$$$$$$$$$")
         if child_obj.step_father_id is None or child_obj.step_father_id == member_obj.member_id:
             # 插入前驱成员节点
             if child_obj.pre_member_id is not None and child_obj.pre_member_id != '':
@@ -163,14 +162,21 @@ def get_child_info(member_queue, member_obj, member_dict):
             son_count += 1
         child_names += "(女) " if child_obj.sex == 0 else " "
 
-        # 出嗣情况
-        if child_obj.step_father_id is not None and child_obj.step_father_id != member_obj.member_id:
-            step_father_id = child_obj.step_father_id
-            step_father_obj = member_obj = member_dict.get(step_father_id)
-            if step_father_obj is None:
-                print("step father not exist", step_father_id)
-            else:
-                step_info = step_info + child_obj.member_name + "出继"+step_father_obj.member_name + "，"
+        if child_obj.step_father_id is not None:
+            if child_obj.step_father_id != member_obj.member_id: # 出嗣情况
+                step_father_id = child_obj.step_father_id
+                step_father_obj = member_dict.get(step_father_id)
+                if step_father_obj is None:
+                    print("step father not exist", step_father_id)
+                else:
+                    step_info = step_info + child_obj.member_name + "出继"+step_father_obj.member_name + "，"
+            else: # 入嗣情况
+                nature_father_id = child_obj.father_id
+                nature_father_obj =member_dict.get(nature_father_id)
+                if nature_father_obj is None:
+                    print("nature father not exist", step_father_id)
+                else:
+                    in_step_info = in_step_info + child_obj.member_name + "过继自" + nature_father_obj.member_name + "，"
 
     if child_names != "":
         child_info += "有"
@@ -182,8 +188,8 @@ def get_child_info(member_queue, member_obj, member_dict):
 
     if step_info != "":
         child_info += "。其中，" + step_info
-
-
+    if in_step_info != "":
+        child_info += "。其中，" + in_step_info
     return child_info
 
 
@@ -276,6 +282,7 @@ def gen_book(member_dict, first_member_id, file_name):
             if has_known_child(member_obj):
                 cur_member_name = '____'
             else:
+                get_child_info(member_queue, member_obj, member_dict) # 确保其子女可以压入队列中
                 continue
 
         #member_obj.print_out()
