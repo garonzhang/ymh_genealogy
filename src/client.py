@@ -37,12 +37,12 @@ def gen_networkx_tree():
 
 
 def gen_graphyviz_tree():
-    first_member_id = 2719
+    first_member_id = 8365
     if first_member_id == 1:
         file_name = "../output/graphyviz_tree.svg"
     else:
         file_name = "../output/graphviz_tmp.svg"
-    title_name = ''
+    title_name = '右为长，粉红色为女性'
     family_tree_pygraphviz.draw_tree(member_dict, first_member_id, file_name, title_name)
 
 

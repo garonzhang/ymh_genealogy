@@ -14,8 +14,9 @@ class Member:
         self.order_seq = order_seq if order_seq is not None else 0
         self.step_order_seq = step_order_seq if step_order_seq is not None else 0
 
-        # 当成员名字大于4个字或首字非张时，保留全名，否则把张姓去掉
-        self.member_name = member_name if len(member_name) > 3 or member_name[0] != '张' else member_name[1:]
+        # 当成员名字大于4个字(不含括号部分)或首字非张时，保留全名，否则把张姓去掉
+        #self.member_name = member_name if len(member_name) > 3 or member_name[0] != '张' else member_name[1:]
+        self.member_name = member_name if len(member_name) > 3 and '(' not in member_name or member_name[0] != '张' else member_name[1:]
 
         self.sex = sex
         self.descent_no = descent_no
