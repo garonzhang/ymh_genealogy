@@ -113,11 +113,13 @@ def get_children_description(member_obj):
             daughter_order += 1
             if child_obj.member_name == '待考' and child_description != '':
                 has_unknown_daughter = True
-    if not has_unknown_daughter:
-        daughter_description = ''
 
-    if daughter_order == 2: #  若仅一女，则无需用"长"代表
-        daughter_description = daughter_description[1:]
+    if not has_unknown_daughter:  # 若不存在待考的女儿，则无需将女儿信息添加至父亲信息中
+        daughter_description = ''
+    else: # 若存在至少一个名待考的女儿，则需将全部女儿信息添加至父亲信息中(上面的循环体中已经全部计算得到)
+        daughter_description = daughter_description
+        if daughter_order == 2: #  若仅一女，则无需用"长"代表
+            daughter_description = daughter_description[1:]
 
     return daughter_description
 
@@ -346,7 +348,7 @@ def gen_book(member_dict, first_member_id, file_name):
         record_content += spouse_description
 
         # 子女备注信息
-        children_description = get_children_description(member_obj)[:-1]
+        children_description = get_children_description(member_obj)#[:-1]
         if children_description != '':
             record_content += children_description[:-1] + '。'
 
