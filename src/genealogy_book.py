@@ -191,7 +191,10 @@ def get_child_info(member_queue, member_obj, member_dict):
     if step_info != "":
         child_info += "。其中，" + step_info
     if in_step_info != "":
-        child_info += "。其中，" + in_step_info
+        if step_info != "":
+            child_info += in_step_info
+        else:
+            child_info += "。其中，" + in_step_info
     return child_info
 
 
@@ -317,7 +320,7 @@ def gen_book(member_dict, first_member_id, file_name):
             if parent_name != '':
                 has_parents = True
             record_content += bio_parent_name
-        if has_parents == False:
+        if has_parents == False and member_obj.member_id != 1:
             record_content += '上世未详，'
 
         # 配偶信息

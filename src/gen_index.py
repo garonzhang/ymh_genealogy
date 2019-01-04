@@ -18,6 +18,10 @@ def get_pinyin(chinese_word):
         result = "lian"
     elif chinese_word == "凖":
         result = "zhun"
+    elif chinese_word == '鵤':
+        result = 'jiao'
+    elif chinese_word == '朝':
+        result = 'chao'
     else:
         result = p.get_pinyin(chinese_word, '')
     return result
@@ -45,6 +49,10 @@ def generate_index(file_name):
             term_list = line.split("	")
             member_name = term_list[0]
             page_no = term_list[1]
+
+            if member_name.find('_') >= 0:
+                line = fh.readline()
+                continue
 
             pinyin = ""
             for chinese_word in member_name:

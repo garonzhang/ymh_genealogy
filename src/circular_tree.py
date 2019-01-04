@@ -19,8 +19,9 @@ def get_child_style(child_obj):
     node_color3 = 'OrangeRed' if child_obj.sex == 0 else 'DeepSkyBlue'
     node_color4 = 'OrangeRed' if child_obj.sex == 0 else '#00FFFF'
     node_color5 = 'OrangeRed' if child_obj.sex == 0 else '#98FB98'
-    node_color = 'OrangeRed' if child_obj.descent_no % 2 == 0 else '#98FB98'
-    width = 0.03
+    ###node_color = 'OrangeRed' if child_obj.descent_no % 2 == 0 else '#98FB98'
+    node_color = 'SpringGreen'
+    width = 0.07
 
     # 针对 dudu，单独处理
     if child_obj.member_id == 1809:
@@ -32,9 +33,10 @@ def get_child_style(child_obj):
 
 def get_edge_style(child_obj):
     edge_color1 = 'DeepSkyBlue' if child_obj.sex == 0 else 'SpringGreen'
-    edge_color = '#40E0D0' if child_obj.descent_no % 2 == 0 else 'SpringGreen'
-    style = 'dotted'#''dotted' 'dashed' 'solid'
-    edge_style = {'color': edge_color, 'weight': 0.002, 'style': style}
+    ###edge_color = '#40E0D0' if child_obj.descent_no % 2 == 0 else 'SpringGreen'
+    edge_color = 'DeepSkyBlue'#'#20B2AA'
+    style = 'dashed'#''dotted' 'dashed' 'solid'
+    edge_style = {'color': edge_color, 'weight': 0.0, 'style': style}
     return edge_style
 
 
@@ -62,10 +64,10 @@ def construct_graph(g, member_dict, first_member_id):
 
 
 def gen_graph(member_dict, first_member_id):
-    img_formats = ['png']#, 'svg']
+    img_formats = ['svg']#'png', 'svg']
     for img_format in img_formats:
         filename = '../output/whole_family.' + img_format
-        g = pgv.AGraph(bgcolor='#000000', format=img_format, ranksep=0.4, nodesep=10, root=1)
+        g = pgv.AGraph(bgcolor='#000000', format=img_format, ranksep=0.4, nodesep=30, root=1)
         construct_graph(g, member_dict, first_member_id)
         g.layout(prog='twopi')
         g.draw(filename)
