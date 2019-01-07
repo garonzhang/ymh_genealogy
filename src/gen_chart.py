@@ -68,16 +68,18 @@ def gen_chart_by_sql(file_name, title, sub_title, sql, chart_type='bar'):
 # 生成柱状图
 def gen_bar(file_name, title, sub_title, name, value):
     bar = Bar(title, sub_title)
-    bar.width = 900
+    bar.width = 1100
     bar.height = 1050
     bar.add("", name, value,
             xaxis_interval=0,
+            yaxis_interval=0,
             bar_category_gap=20, # 类目轴的柱状距离，当设置为 0 时柱状是紧挨着（直方图类型），默认为 '20%'
-            is_convert=False,
+            is_convert=True,
             #is_label_show=True,
-            #xaxis_type='category',
-            #is_xaxis_inverse = True,
+            xaxis_type='category',
+            #is_xaxis_inverse=True,
             is_yaxis_boundarygap=True,
+            is_xaxis_show=True,
             is_xaxis_boundarygap=True
 
             )
